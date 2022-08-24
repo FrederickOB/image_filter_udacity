@@ -30,17 +30,22 @@ import fs from "fs";
   /**************************************************************************** */
   app.get("/filteredimage", async (req: Request, res: Response) => {
     const { image_url } = req.query;
+    // validate the image_url query
     if (!image_url) {
       res.status(422).send("add an image url");
     } else {
+      // get all files from tmp directory
       const filterTempFiles = fs.readdirSync(__dirname + "/util/tmp");
+
+      //  deletes any files on the server on finish of the response
       await deleteLocalFiles(filterTempFiles);
+
+      // call filterImageFromURL(image_url) to filter the image
       const filteredPath = await filterImageFromURL(image_url);
 
+      // send the resulting file in the response
       return res.sendFile(filteredPath);
     }
-
-    // console.log("files", files);
   });
   //! END @TODO1
 
