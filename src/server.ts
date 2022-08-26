@@ -31,9 +31,7 @@ import fs from "fs";
   app.get("/filteredimage", async (req: Request, res: Response) => {
     const { image_url } = req.query;
     // validate the image_url query
-    if (!image_url) {
-      res.status(400).send("add an image url");
-    } else {
+    if (image_url) {
       try {
         // get all files from tmp directory
         const filterTempFiles = fs.readdirSync(__dirname + "/util/tmp");
@@ -42,14 +40,18 @@ import fs from "fs";
         await deleteLocalFiles(filterTempFiles);
 
         // call filterImageFromURL(image_url) to filter the image
-        const filteredPath = await filterImageFromURL(image_url);
+        const filteredPath = await filterImageFromURL(image_url as string);
 
         // send the resulting file in the response
 
         return res.sendFile(filteredPath);
       } catch (error) {
+        console.log(error);
+
         return res.status(422).send("Unprocessable Entity");
       }
+    } else {
+      res.status(400).send("add an image url");
     }
   });
   //! END @TODO1
