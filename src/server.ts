@@ -32,13 +32,16 @@ import fs from "fs";
     const { image_url } = req.query;
     // validate the image_url query
     if (image_url) {
-      try {
-        // get all files from tmp directory
+      // check if directory exists
+      if (fs.existsSync(__dirname + "/util/tmp")) {
+        // get files from tmp directory
         const filterTempFiles = fs.readdirSync(__dirname + "/util/tmp");
 
         //  deletes any files on the server on finish of the response
         await deleteLocalFiles(filterTempFiles);
+      }
 
+      try {
         // call filterImageFromURL(image_url) to filter the image
         const filteredPath = await filterImageFromURL(image_url as string);
 
@@ -46,8 +49,6 @@ import fs from "fs";
 
         return res.sendFile(filteredPath);
       } catch (error) {
-        console.log(error);
-
         return res.status(422).send("Unprocessable Entity");
       }
     } else {
